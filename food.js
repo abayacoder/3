@@ -1,146 +1,63 @@
-
 class Food {
-    constructor() {
-        this.image = loadImage("images/Milk.png");
-    }
-    
-    getFoodStock() {
-        var foodStockRef = database.ref('food');
-        foodStockRef.on("value", (data)=>{
-        foodCount = data.val();
-        });
+    constructor(){
+    this.foodStock=0;
+    this.lastFed;
+    this.image=loadImage('Images/Milk.png');
     }
 
-    updateFoodStock(foodStockToUpdate) {
-        database.ref('/').update({
-            food: foodStockToUpdate
-        });
+   updateFoodStock(foodStock){
+    this.foodStock=foodStock;
+   }
+
+   getFedTime(lastFed){
+     this.lastFed=lastFed;
+   }
+
+   deductFood(){
+     if(this.foodStock>0){
+      this.foodStock=this.foodStock-1;
+     }
     }
 
-    getFedTime() {
-        var fedTimeRef = database.ref('last Fed');
-        fedTimeRef.on("value", (data)=>{
-            lastFed = data.val();
-        });
+    getFoodStock(){
+      return this.foodStock;
     }
 
-    updateFedTime() {
-        database.ref('/').update({
-            lastFed: hour()
-        });
-    }
+    display(){
+        background(46,139,87);
 
-    async start(){
-        var foodRef = await database.ref('food').once("value");
-        if(foodRef.exists()) {
-            foodCount = foodRef.val();
-        }
-
-        var lastFedRef = await database.ref('lastFed').once("value");
-        if(lastFedRef.exists()) {
-            lastFed = lastFedRef.val();
-        }        
-
-        var gameStateRef = await database.ref('gameState').once("value");
-        if(gameStateRef.exists()) {
-            gameState = gameStateRef.val();
-        }        
-
-      }
-
-    display() {
+        fill(255,255,254);
         textSize(15);
-        fill("white");
-        stroke(5);
-        if(lastFed >= 12) {
-            text("Last Fed: " + lastFed % 12 + " PM", 50, 60);
-        } else if(lastFed === 0){
-            text("Last Fed: 12 AM", 50, 60);
-        } else {
-            text("Last Fed: " + lastFed + " AM", 50, 60);
+        if(lastFed>=12){
+            text("Last Feed : "+ lastFed%12 + " PM", 50,30);
+        }else if(lastFed==0){
+            text("Last Feed : 12 AM",50,30);
+        }else{
+            text("Last Feed : "+ lastFed + " AM", 50,30);
         }
-
-        var x = 80, y = 100;
+        var x=70,y=100; 
         imageMode(CENTER);
-        if(foodCount != 0) {
-            for(var i = 0; i < foodCount; i++) {
-                if(i % 10 === 0) {
-                    x = 80;
-                    y = y + 50;
-                }
-                image(milkImg, x, y, 50, 50);
-                x = x + 30;
-            }
+        if(this.foodStock!=0){
+        for(var i=0;i<this.foodStock;i++){
+          if(i%10==0){
+            x=70;
+            y=y+50;
+          }
+          image(this.image,x,y,50,50);
+          x=x+30;
         }
+      }
     }
 
-    bedroom() {
-        background(bedRoomImg, 800, 400);
+    bedroom(){
+        background(bedroom,550,500);  
     }
+      
+    garden(){
+        background(garden,550,500);  
+    } 
 
-    washroom() {
-        background(washRoomImg, 800, 400);
+    washroom(){
+        background(washroom,550,500); 
     }
-
-    garden() {
-        background(gardenImg, 800, 400);
-    }
-
-    getState() {
-        readState = database.ref('gameState');
-        readState.on("value", (data)=>{
-        gameState = data.val();
-     });
-    }
-
-    updateState(state) {
-        database.ref('/').update({
-        gameState : state
-      })
-    }
-
-    defineState()
-    {
-        currentTime = hour();
-
-        if(gameState === "hungry"){
-            food1.display();
-            addFood.show();
-            feed.show();
-            input.show();
-            dog.visible = true;
-            this.updateState(gameState);
-          } if(currentTime === lastFed + 1) {
-            food1.garden();
-            gameState = "playing"
-            addFood.hide();
-            feed.hide();
-            dog.visible = false;
-            this.updateState(gameState);
-          } else if(currentTime === lastFed + 2) {
-            food1.bedroom();
-            gameState = "sleeping"
-            addFood.hide();
-            feed.hide();
-            dog.visible = false;
-            this.updateState(gameState);
-          } else if(currentTime >= (lastFed + 2) && currentTime <= (lastFed + 4)) {
-            food1.washroom();
-            gameState = "bathing"
-            addFood.hide();
-            feed.hide();
-            dog.visible = false;
-            this.updateState(gameState);
-          } else {
-            gameState = "hungry"
-            food1.display();
-            addFood.show();
-            feed.show();
-            input.show();
-            dog.visible = true;
-            this.updateState(gameState);
-          } 
-
-    }
-
 }
